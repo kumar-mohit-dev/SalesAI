@@ -15,7 +15,7 @@ train_data['weekday'] = train_data['date'].dt.weekday
 sales_99th_percentile = np.percentile(train_data['sales'], 99)
 train_data['sales'] = train_data['sales'].clip(upper=sales_99th_percentile)
 train_data['log_sales'] = np.log1p(train_data['sales'])
-for lag in range(1, 8):  # Lag features for the past 7 days
+for lag in range(1, 8):
     train_data[f'sales_lag_{lag}'] = train_data.groupby(['store_nbr', 'family'])['sales'].shift(lag)
 
 train_data['rolling_avg_7'] = train_data.groupby(['store_nbr', 'family'])['sales'].transform(
@@ -62,11 +62,11 @@ X_test = test_data[features]
 log_sales_pred = model.predict(X_test)
 test_data['sales'] = np.expm1(log_sales_pred) 
 test_data['sales'] = test_data['sales'].clip(lower=0) 
-submission = test_data[['id']]
-submission['sales'] = test_data['sales']
-submission.to_csv('Hackerton_Hackers_viva_submission.csv', index=False)
+final = test_data[['id']]
+final['sales'] = test_data['sales']
+final.to_csv('final.csv', index=False)
 
-print("Submission file created: 'submission.csv'")
+print("Final file created: 'final.csv'")
 uploaded_file = 'train.csv'
 train_data_xls = pd.read_csv(uploaded_file, parse_dates=['date'])
 train_data_xls = train_data_xls.merge(oil_data, on='date', how='left')
